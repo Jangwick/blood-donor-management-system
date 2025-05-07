@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Donor - BloodDonor{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h1 class="fw-bold text-red-700"><i class="fas fa-edit me-2"></i>Edit Donor</h1>
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('admin_edit_donor', donor_id=donor.id) }}">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ donor.name }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ donor.email }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="blood_type" class="form-label">Blood Type</label>
+                <select class="form-select" id="blood_type" name="blood_type" required>
+                    <option value="" disabled selected>Select Blood Type</option>
+                    <option value="A+" {% if donor.profile and donor.profile.blood_type == 'A+' %}selected{% endif %}>A+</option>
+                    <option value="A-" {% if donor.profile and donor.profile.blood_type == 'A-' %}selected{% endif %}>A-</option>
+                    <option value="B+" {% if donor.profile and donor.profile.blood_type == 'B+' %}selected{% endif %}>B+</option>
+                    <option value="B-" {% if donor.profile and donor.profile.blood_type == 'B-' %}selected{% endif %}>B-</option>
+                    <option value="AB+" {% if donor.profile and donor.profile.blood_type == 'AB+' %}selected{% endif %}>AB+</option>
+                    <option value="AB-" {% if donor.profile and donor.profile.blood_type == 'AB-' %}selected{% endif %}>AB-</option>
+                    <option value="O+" {% if donor.profile and donor.profile.blood_type == 'O+' %}selected{% endif %}>O+</option>
+                    <option value="O-" {% if donor.profile and donor.profile.blood_type == 'O-' %}selected{% endif %}>O-</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-danger">Save Changes</button>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

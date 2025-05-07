@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Badges - Admin{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h1 class="fw-bold text-red-700"><i class="fas fa-medal me-2"></i>Manage Badges</h1>
+        <p class="lead">Create and manage achievement badges for donors</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{{ url_for('admin_create_badge') }}" class="btn btn-danger">
+            <i class="fas fa-plus-circle me-2"></i>Create New Badge
+        </a>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for badge in badges %}
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="badge-icon mb-3 mx-auto">
+                    <i class="fas fa-{{ badge.icon }} fa-3x text-warning"></i>
+                </div>
+                <h5 class="card-title mb-1">{{ badge.name }}</h5>
+                <p class="text-muted">{{ badge.description }}</p>
+                <hr>
+                <div class="small text-muted mb-3">
+                    <strong>Criteria:</strong> {{ badge.criteria }}
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-sm btn-primary edit-badge" data-id="{{ badge.id }}">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger delete-badge" data-id="{{ badge.id }}" data-name="{{ badge.name }}">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </button>
+                </div>
+            </div>
+            <div class="card-footer bg-light text-center">
+                <div class="form-check form-switch d-flex align-items-center justify-content-center gap-2">
+                    <input class="form-check-input" type="checkbox" role="switch" id="activeBadge{{ badge.id }}" checked>
+                    <label class="form-check-label small" for="activeBadge{{ badge.id }}">Active</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-info-circle fa-3x mb-3"></i>
+            <h5>No badges have been created yet</h5>
+            <p>Create your first badge to start recognizing donor achievements.</p>
+            <a href="{{ url_for('admin_create_badge') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Create First Badge
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the badge <strong id="badgeToDelete"></strong>?</p>
+                <p class="text-danger">This will remove the badge from all users who have earned it.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" action="" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete Badge</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete modal setup
+        const deleteButtons = document.querySelectorAll('.delete-badge');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const badgeId = this.getAttribute('data-id');
+                const badgeName = this.getAttribute('data-name');
+                
+                document.getElementById('badgeToDelete').textContent = badgeName;
+                document.getElementById('deleteForm').action = `/admin/badges/${badgeId}/delete`;
+                
+                const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                modal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

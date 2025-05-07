@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Blood Requests - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Emergency Blood Requests</h1>
+            <p class="lead">Manage all emergency blood donation requests</p>
+        </div>
+        
+        <div class="col-md-4 text-md-end">
+            <!-- Add Create Emergency Request Button -->
+          
+        </div>
+            <a href="{{ url_for('admin_create_emergency_request') }}" class="btn btn-danger me-2">
+                <i class="fas fa-plus-circle me-2"></i>Create Emergency Request
+            </a>
+           
+        </div>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-danger bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="text-danger fw-bold mb-1">{{ active_requests|length }}</h3>
+                    <p class="mb-0"><i class="fas fa-fire me-1"></i> Active Requests</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="text-success fw-bold mb-1">{{ fulfilled_requests|length }}</h3>
+                    <p class="mb-0"><i class="fas fa-check-circle me-1"></i> Fulfilled</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="text-warning fw-bold mb-1">{{ cancelled_requests|length }}</h3>
+                    <p class="mb-0"><i class="fas fa-times-circle me-1"></i> Cancelled</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-secondary bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="text-secondary fw-bold mb-1">{{ expired_requests|length }}</h3>
+                    <p class="mb-0"><i class="fas fa-clock me-1"></i> Expired</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <ul class="nav nav-tabs card-header-tabs" id="requestTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active text-danger fw-bold" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab" aria-controls="active" aria-selected="true">
+                        <i class="fas fa-fire me-1"></i>Active Requests <span class="badge bg-danger ms-2">{{ active_requests|length }}</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link text-success" id="fulfilled-tab" data-bs-toggle="tab" data-bs-target="#fulfilled" type="button" role="tab" aria-controls="fulfilled" aria-selected="false">
+                        <i class="fas fa-check-circle me-1"></i>Fulfilled Requests
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link text-secondary" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab" aria-controls="cancelled" aria-selected="false">
+                        <i class="fas fa-times-circle me-1"></i>Cancelled/Expired
+                    </button>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="card-body">
+            <div class="tab-content" id="requestTabsContent">
+                <div class="tab-pane fade show active" id="active" role="tabpanel" aria-labelledby="active-tab">
+                    {% if active_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Hospital</th>
+                                        <th>Blood Type</th>
+                                        <th>Quantity</th>
+                                        <th>Urgency</th>
+                                        <th>Created</th>
+                                        <th>Age</th>
+                                        <th>Responses</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in active_requests %}
+                                    <tr>
+                                        <td class="fw-bold">{{ request.hospital.username }}</td>
+                                        <td><span class="badge bg-danger">{{ request.blood_type }}</span></td>
+                                        <td>{{ request.quantity_needed }} units</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if request.urgency_level == 'critical' %}bg-danger
+                                                {% elif request.urgency_level == 'urgent' %}bg-warning text-dark
+                                                {% else %}bg-info text-dark{% endif %}">
+                                                {{ request.urgency_level|upper }}
+                                            </span>
+                                        </td>
+                                        <td>{{ request.created_at.strftime('%b %d, %H:%M') }}</td>
+                                        <td>
+                                            {% set age = ((now - request.created_at).total_seconds() / 3600)|int %}
+                                            <span class="badge
+                                                {% if age > 24 %}bg-danger
+                                                {% elif age > 12 %}bg-warning text-dark
+                                                {% else %}bg-success{% endif %}">
+                                                {{ age }}hr{% if age != 1 %}s{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% set response_count = request.responses.count() %}
+                                            {% set available_count = request.responses.filter_by(response='available').count() %}
+                                            <button class="btn btn-sm {% if available_count > 0 %}btn-outline-success{% else %}btn-outline-primary{% endif %}" data-bs-toggle="modal" data-bs-target="#responsesModal{{ request.id }}">
+                                                <i class="fas fa-users me-1"></i> {{ available_count }}/{{ response_count }}
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="actionDropdown{{ request.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionDropdown{{ request.id }}">
+                                                    <li>
+                                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#responsesModal{{ request.id }}">
+                                                            <i class="fas fa-users text-primary me-2"></i>View Responses
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <form action="{{ url_for('admin_fulfill_emergency_request', request_id=request.id) }}" method="POST">
+                                                            <button type="submit" class="dropdown-item" onclick="return confirm('Mark this request as fulfilled?')">
+                                                                <i class="fas fa-check text-success me-2"></i>Mark as Fulfilled
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                    <li>
+                                                        <form action="{{ url_for('admin_expire_emergency_request', request_id=request.id) }}" method="POST">
+                                                            <button type="submit" class="dropdown-item" onclick="return confirm('Mark this request as expired?')">
+                                                                <i class="fas fa-times text-danger me-2"></i>Mark as Expired
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>There are no active emergency requests.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="tab-pane fade" id="fulfilled" role="tabpanel" aria-labelledby="fulfilled-tab">
+                    {% if fulfilled_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Hospital</th>
+                                        <th>Blood Type</th>
+                                        <th>Quantity</th>
+                                        <th>Created</th>
+                                        <th>Fulfilled</th>
+                                        <th>Responses</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in fulfilled_requests %}
+                                    <tr>
+                                        <td class="fw-bold">{{ request.hospital.username }}</td>
+                                        <td><span class="badge bg-danger">{{ request.blood_type }}</span></td>
+                                        <td>{{ request.quantity_needed }} units</td>
+                                        <td>{{ request.created_at.strftime('%b %d, %H:%M') }}</td>
+                                        <td>
+                                            {% if hasattr(request, 'updated_at') and request.updated_at %}
+                                                {{ request.updated_at.strftime('%b %d, %H:%M') }}
+                                            {% else %}
+                                                {{ request.created_at.strftime('%b %d, %H:%M') if request.created_at else 'Unknown' }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#responsesModal{{ request.id }}">
+                                                <i class="fas fa-users me-1"></i> View Responses
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>There are no fulfilled emergency requests.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+                    {% set other_requests = cancelled_requests + expired_requests %}
+                    {% if other_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Hospital</th>
+                                        <th>Blood Type</th>
+                                        <th>Quantity</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Ended</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in other_requests %}
+                                    <tr>
+                                        <td class="fw-bold">{{ request.hospital.username }}</td>
+                                        <td><span class="badge bg-danger">{{ request.blood_type }}</span></td>
+                                        <td>{{ request.quantity_needed }} units</td>
+                                        <td>
+                                            <span class="badge 
+                                            {% if request.status == 'cancelled' %}bg-secondary
+                                            {% elif request.status == 'expired' %}bg-dark
+                                            {% endif %}">
+                                                {{ request.status|upper }}
+                                            </span>
+                                        </td>
+                                        <td>{{ request.created_at.strftime('%b %d, %H:%M') }}</td>
+                                        <td>
+                                            {% if hasattr(request, 'updated_at') and request.updated_at %}
+                                                {{ request.updated_at.strftime('%b %d, %H:%M') }}
+                                            {% else %}
+                                                {{ request.created_at.strftime('%b %d, %H:%M') if request.created_at else 'Unknown' }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>There are no cancelled or expired emergency requests.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% for request in active_requests + fulfilled_requests %}
+<!-- Response Modal for each emergency request -->
+<div class="modal fade" id="responsesModal{{ request.id }}" tabindex="-1" aria-labelledby="responsesModalLabel{{ request.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="responsesModalLabel{{ request.id }}">
+                    <i class="fas fa-users me-2"></i>Donor Responses for {{ request.blood_type }} Blood Request
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 p-3 bg-light rounded">
+                    <h6 class="mb-1"><i class="fas fa-hospital me-2 text-danger"></i>Hospital: <span class="fw-bold">{{ request.hospital.username }}</span></h6>
+                    <p class="mb-1"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Location: <span class="fw-bold">{{ request.hospital.location or 'Not specified' }}</span></p>
+                    <p class="mb-1"><i class="fas fa-clock me-2 text-danger"></i>Requested: <span class="fw-bold">{{ request.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span></p>
+                    <p class="mb-0"><i class="fas fa-exclamation-circle me-2 text-danger"></i>Message: <span class="fw-bold">{{ request.message or 'No additional details provided' }}</span></p>
+                </div>
+
+                {% set responses = request.responses.all() %}
+                {% if responses %}
+                    <h6 class="border-bottom pb-2 mb-3">Donor Responses ({{ responses|length }})</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Donor</th>
+                                    <th>Blood Type</th>
+                                    <th>Response</th>
+                                    <th>Response Time</th>
+                                    <th>Status</th>
+                                    <th>Contact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for response in responses %}
+                                <tr>
+                                    <td class="fw-bold">{{ response.donor.username }}</td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            {{ response.donor.profile.blood_type if response.donor.profile and response.donor.profile.blood_type else 'Unknown' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if response.response == 'available' %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ response.response|upper }}
+                                        </span>
+                                    </td>
+                                    <td>{{ response.response_time.strftime('%b %d, %H:%M') }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if response.arrival_status == 'arrived' %}bg-success
+                                            {% elif response.arrival_status == 'no-show' %}bg-danger
+                                            {% else %}bg-warning text-dark{% endif %}">
+                                            {{ response.arrival_status|upper }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if response.donor.contact_number %}
+                                            <a href="tel:{{ response.donor.contact_number }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-phone me-1"></i> {{ response.donor.contact_number }}
+                                            </a>
+                                        {% else %}
+                                            Not provided
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No responses received yet for this request.
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                {% if request.status == 'active' %}
+                <form action="{{ url_for('admin_fulfill_emergency_request', request_id=request.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check-circle me-2"></i>Mark as Fulfilled
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add current datetime for age calculations
+    document.addEventListener('DOMContentLoaded', function() {
+        window.now = new Date();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Requests - BloodDonor{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="fw-bold text-red-700"><i class="fas fa-heartbeat me-2"></i>Emergency Requests</h1>
+    <div class="table-responsive mt-4">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Hospital</th>
+                    <th>Blood Type</th>
+                    <th>Quantity Needed</th>
+                    <th>Urgency Level</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                <tr>
+                    <td>{{ request.hospital.username if request.hospital else 'N/A' }}</td>
+                    <td>{{ request.blood_type }}</td>
+                    <td>{{ request.quantity_needed }} units</td>
+                    <td>
+                        <span class="badge {% if request.urgency_level == 'critical' %}bg-danger{% elif request.urgency_level == 'urgent' %}bg-warning{% else %}bg-info{% endif %}">
+                            {{ request.urgency_level.capitalize() }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if request.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ request.status.capitalize() }}
+                        </span>
+                    </td>
+                    <td>{{ request.created_at.strftime('%b %d, %Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mt-3">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ - BloodDonor{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold text-red-700 mb-3">Frequently Asked Questions</h1>
+            <p class="lead text-muted">Everything you need to know about blood donation and our platform.</p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="accordion" id="faqAccordion">
+                <!-- General Questions -->
+                <div class="mb-4">
+                    <h3 class="fw-bold text-red-700 mb-3">General Questions</h3>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Who can donate blood?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>In general, blood donors must be:</p>
+                                <ul>
+                                    <li>In good health and feeling well</li>
+                                    <li>At least 17 years old in most states</li>
+                                    <li>Weighing at least 110 pounds</li>
+                                    <li>Not have donated blood in the last 8 weeks (56 days)</li>
+                                </ul>
+                                <p>Some medical conditions or medications might affect your eligibility. Our system will help determine if you're eligible to donate.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                How often can I donate blood?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>You can donate whole blood every 56 days (8 weeks). If you donate platelets, you can donate every 7 days, up to 24 times a year. For plasma, you can donate every 28 days, and for double red cells, every 112 days.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Is blood donation safe?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>Yes, blood donation is very safe. All equipment used during the donation is sterile and used only once. There's no risk of contracting any disease from donating blood. The donation process is conducted by trained healthcare professionals who ensure your safety throughout.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Platform Questions -->
+                <div class="mb-4">
+                    <h3 class="fw-bold text-red-700 mb-3">About BloodDonor Platform</h3>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                How do I sign up as a donor?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>To sign up as a donor:</p>
+                                <ol>
+                                    <li>Click "Register" in the top menu</li>
+                                    <li>Fill out the registration form and select "Blood Donor" as your role</li>
+                                    <li>Complete your profile with your health information</li>
+                                    <li>You're now ready to schedule donations or respond to blood requests</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="headingFive">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                How do hospitals request blood?
+                            </button>
+                        </h2>
+                        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>Hospitals can register on our platform and create a hospital account. Once verified, they can post regular or emergency blood requests. Our system will automatically notify eligible donors in the vicinity based on blood type compatibility and location.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="headingSix">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                What happens when I receive an emergency blood request?
+                            </button>
+                        </h2>
+                        <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>When you receive an emergency request:</p>
+                                <ol>
+                                    <li>You'll get a notification on the app and via email (if enabled)</li>
+                                    <li>You can respond with "I'm Available" or "Not Available"</li>
+                                    <li>If available, you'll receive the hospital location and contact details</li>
+                                    <li>The hospital will be notified of your response</li>
+                                </ol>
+                                <p>You're never obligated to respond to requests, but prompt responses help save lives in critical situations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Health & Safety -->
+                <div>
+                    <h3 class="fw-bold text-red-700 mb-3">Health & Safety</h3>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="headingSeven">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                What should I do before donating blood?
+                            </button>
+                        </h2>
+                        <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>Before donating blood:</p>
+                                <ul>
+                                    <li>Get a good night's sleep</li>
+                                    <li>Eat a healthy meal before your donation</li>
+                                    <li>Drink plenty of water before and after donating</li>
+                                    <li>Avoid fatty foods before donating</li>
+                                    <li>Bring a valid ID</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header" id="headingEight">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                                What happens after I donate blood?
+                            </button>
+                        </h2>
+                        <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>After donating:</p>
+                                <ul>
+                                    <li>Rest for 10-15 minutes and have a light snack</li>
+                                    <li>Drink extra fluids for the next 24-48 hours</li>
+                                    <li>Avoid heavy lifting or strenuous exercise for 24 hours</li>
+                                    <li>Keep the bandage on for at least 4 hours</li>
+                                    <li>If you feel dizzy or unwell, lie down with your feet elevated</li>
+                                </ul>
+                                <p>Your body will replace the fluid lost from donation within 24 hours, and the red blood cells within 4-6 weeks.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

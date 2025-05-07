@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Badge - Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 fw-bold text-red-700">
+                        <i class="fas fa-medal me-2"></i>Create Badge
+                    </h5>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('admin_create_badge') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="name" class="form-label">Badge Name*</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="icon" class="form-label">Badge Icon*</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-icons"></i></span>
+                                <select class="form-select" id="icon" name="icon" required>
+                                    <option value="star">Star</option>
+                                    <option value="medal">Medal</option>
+                                    <option value="trophy">Trophy</option>
+                                    <option value="award">Award</option>
+                                    <option value="heart">Heart</option>
+                                    <option value="certificate">Certificate</option>
+                                    <option value="shield-alt">Shield</option>
+                                    <option value="crown">Crown</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description*</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-comment-alt"></i></span>
+                            <textarea class="form-control" id="description" name="description" rows="2" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="criteria" class="form-label">Achievement Criteria*</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tasks"></i></span>
+                            <textarea class="form-control" id="criteria" name="criteria" rows="2" required 
+                                      placeholder="Example: 3+ donations in 12 months"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Badge Preview</label>
+                            <div class="border rounded p-4 text-center">
+                                <div id="badge-preview" class="d-inline-block position-relative">
+                                    <div class="badge-icon mb-2">
+                                        <i class="fas fa-star fa-3x text-warning"></i>
+                                    </div>
+                                    <div id="badge-name" class="fw-bold">Badge Name</div>
+                                    <div id="badge-description" class="small text-muted">Badge description will appear here</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="reset" class="btn btn-light">Clear Form</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-plus-circle me-1"></i> Create Badge
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Live preview functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameInput = document.getElementById('name');
+        const descInput = document.getElementById('description');
+        const iconSelect = document.getElementById('icon');
+        
+        const namePreview = document.getElementById('badge-name');
+        const descPreview = document.getElementById('badge-description');
+        const iconPreview = document.querySelector('.badge-icon i');
+        
+        nameInput.addEventListener('input', function() {
+            namePreview.textContent = this.value || 'Badge Name';
+        });
+        
+        descInput.addEventListener('input', function() {
+            descPreview.textContent = this.value || 'Badge description will appear here';
+        });
+        
+        iconSelect.addEventListener('change', function() {
+            iconPreview.className = `fas fa-${this.value} fa-3x text-warning`;
+        });
+    });
+</script>
+{% endblock %}

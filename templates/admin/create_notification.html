@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Notification - Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 fw-bold text-red-700">
+                        <i class="fas fa-bell me-2"></i>Create Notification
+                    </h5>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('admin_create_notification') }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Notification Type*</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="general">General Announcement</option>
+                                <option value="emergency">Emergency Alert</option>
+                                <option value="donation">Donation Campaign</option>
+                                <option value="achievement">Achievement & Badges</option>
+                                <option value="system">System Notification</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Notification Message*</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-comment-alt"></i></span>
+                            <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="recipient_type" class="form-label">Send To*</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-users"></i></span>
+                            <select class="form-select" id="recipient_type" name="recipient_type" required>
+                                <option value="all">All Users</option>
+                                <option value="all_donors">All Donors</option>
+                                <option value="all_hospitals">All Hospitals/Blood Banks</option>
+                                <option value="specific_donor">Specific Donor</option>
+                                <option value="specific_hospital">Specific Hospital</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="specific_donor_container" style="display: none;">
+                        <label for="donor_id" class="form-label">Select Donor</label>
+                        <select class="form-select" id="donor_id" name="user_id">
+                            <option value="">Select a Donor</option>
+                            {% for donor in donors %}
+                                <option value="{{ donor.id }}">
+                                    {{ donor.username }} ({{ donor.email }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="specific_hospital_container" style="display: none;">
+                        <label for="hospital_id" class="form-label">Select Hospital/Blood Bank</label>
+                        <select class="form-select" id="hospital_id" name="user_id">
+                            <option value="">Select a Hospital</option>
+                            {% for hospital in hospitals %}
+                                <option value="{{ hospital.id }}">
+                                    {{ hospital.username }} ({{ hospital.email }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="reset" class="btn btn-light">Clear Form</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-paper-plane me-1"></i> Send Notification
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('recipient_type').addEventListener('change', function() {
+        const donorContainer = document.getElementById('specific_donor_container');
+        const hospitalContainer = document.getElementById('specific_hospital_container');
+        
+        // Hide both containers initially
+        donorContainer.style.display = 'none';
+        hospitalContainer.style.display = 'none';
+        
+        // Show the appropriate container based on selection
+        if (this.value === 'specific_donor') {
+            donorContainer.style.display = 'block';
+        } else if (this.value === 'specific_hospital') {
+            hospitalContainer.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!-- ...existing code... -->
+<table>
+    <thead>
+        <tr>
+            <th>Blood Bank Name</th>
+            <th>Email</th>
+            <th>Contact Number</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for blood_bank in blood_banks %}
+        <tr>
+            <td>{{ blood_bank.username }}</td>
+            <td>{{ blood_bank.email }}</td>
+            <td>{{ blood_bank.contact_number }}</td>
+            <td>
+                <a href="{{ url_for('admin_view_blood_bank', blood_bank_id=blood_bank.id) }}">View</a>
+                <a href="{{ url_for('admin_edit_blood_bank', blood_bank_id=blood_bank.id) }}">Edit</a>
+                <form action="{{ url_for('admin_delete_blood_bank', blood_bank_id=blood_bank.id) }}" method="POST" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- ...existing code... -->

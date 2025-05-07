@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}BloodDonor - Home{% endblock %}
+
+{% block content %}
+<div class="row align-items-center">
+    <div class="col-lg-6">
+        <h1 class="display-4 fw-bold text-red-700 mb-4">Every Drop Counts</h1>
+        <p class="lead mb-4">Donating blood is a simple act that can save multiple lives. Join our community of donors and make a difference today.</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4 mb-lg-3">
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('register') }}" class="btn btn-danger btn-lg px-4 me-md-2 fw-bold">Become a Donor</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-danger btn-lg px-4">Login</a>
+            {% else %}
+                {% if current_user.role == 'donor' %}
+                <a href="{{ url_for('donor_dashboard') }}" class="btn btn-danger btn-lg px-4 me-md-2 fw-bold">Go to Dashboard</a>
+                {% elif current_user.role == 'hospital' %}
+                <a href="{{ url_for('hospital_dashboard') }}" class="btn btn-danger btn-lg px-4 me-md-2 fw-bold">Go to Dashboard</a>
+                {% elif current_user.role == 'admin' %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-danger btn-lg px-4 me-md-2 fw-bold">Go to Dashboard</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <img src="{{ url_for('static', filename='images/hero.svg') }}" alt="Blood Donation" class="img-fluid">
+    </div>
+</div>
+
+<div class="row mt-5 pt-3">
+    <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold text-red-700">Why Donate Blood?</h2>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+    <div class="col">
+        <div class="card h-100 shadow-sm hover:shadow-md transition-shadow border-0">
+            <div class="card-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-user-friends text-danger fa-3x"></i>
+                </div>
+                <h5 class="card-title">Save Lives</h5>
+                <p class="card-text">Just one donation can help save up to three lives.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm hover:shadow-md transition-shadow border-0">
+            <div class="card-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-heartbeat text-danger fa-3x"></i>
+                </div>
+                <h5 class="card-title">Health Benefits</h5>
+                <p class="card-text">Regular blood donation can improve your cardiovascular health.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm hover:shadow-md transition-shadow border-0">
+            <div class="card-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-hospital text-danger fa-3x"></i>
+                </div>
+                <h5 class="card-title">Community Support</h5>
+                <p class="card-text">Help maintain adequate blood supply for your local medical facilities.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row bg-light py-5 rounded-3 shadow-sm mt-5">
+    <div class="col-md-6 mb-3 mb-md-0">
+        <h3 class="fw-bold text-red-700 mb-4">How It Works</h3>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i> Register as a donor</li>
+            <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i> Complete your profile with medical information</li>
+            <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i> Receive notifications when blood is needed</li>
+            <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i> Schedule appointments at your convenience</li>
+            <li class="list-group-item bg-transparent"><i class="fas fa-check-circle text-success me-2"></i> Track your donation history and impact</li>
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h3 class="fw-bold text-red-700 mb-4">Blood Types</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Blood Type</th>
+                        <th>Can Donate To</th>
+                        <th>Can Receive From</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A+</td>
+                        <td>A+, AB+</td>
+                        <td>A+, A-, O+, O-</td>
+                    </tr>
+                    <tr>
+                        <td>A-</td>
+                        <td>A+, A-, AB+, AB-</td>
+                        <td>A-, O-</td>
+                    </tr>
+                    <tr>
+                        <td>B+</td>
+                        <td>B+, AB+</td>
+                        <td>B+, B-, O+, O-</td>
+                    </tr>
+                    <tr>
+                        <td>B-</td>
+                        <td>B+, B-, AB+, AB-</td>
+                        <td>B-, O-</td>
+                    </tr>
+                    <tr>
+                        <td>AB+</td>
+                        <td>AB+</td>
+                        <td>All types</td>
+                    </tr>
+                    <tr>
+                        <td>AB-</td>
+                        <td>AB+, AB-</td>
+                        <td>A-, B-, AB-, O-</td>
+                    </tr>
+                    <tr>
+                        <td>O+</td>
+                        <td>A+, B+, AB+, O+</td>
+                        <td>O+, O-</td>
+                    </tr>
+                    <tr>
+                        <td>O-</td>
+                        <td>All types</td>
+                        <td>O-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

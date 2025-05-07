@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments - BloodDonor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-red-700"><i class="fas fa-calendar-check me-2"></i>My Appointments</h1>
+            <p class="lead">View and manage your blood donation appointments</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('donor_schedule_donation') }}" class="btn btn-danger">
+                <i class="fas fa-plus-circle me-2"></i>Schedule New Appointment
+            </a>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs mb-4" id="appointmentTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" 
+                type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+                <i class="fas fa-calendar-day me-1"></i> Upcoming
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" 
+                type="button" role="tab" aria-controls="past" aria-selected="false">
+                <i class="fas fa-history me-1"></i> Past Appointments
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" 
+                type="button" role="tab" aria-controls="cancelled" aria-selected="false">
+                <i class="fas fa-times-circle me-1"></i> Cancelled
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="appointmentTabsContent">
+        <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {% set upcoming_appointments = appointments|selectattr('status', 'in', ['Pending', 'Approved', 'Scheduled'])|list %}
+                    {% if upcoming_appointments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Hospital</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in upcoming_appointments %}
+                                    <tr>
+                                        <td>{{ appointment.date }}</td>
+                                        <td>{{ appointment.time }}</td>
+                                        <td>{{ appointment.hospital_name }}</td>
+                                        <td>{{ appointment.hospital_location }}</td>
+                                        <td>
+                                            <span class="badge {% if appointment.status == 'Approved' %}bg-success
+                                                {% elif appointment.status == 'Pending' %}bg-warning text-dark
+                                                {% else %}bg-info{% endif %}">
+                                                {{ appointment.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-outline-primary" 
+                                                        data-bs-toggle="modal" data-bs-target="#detailsModal{{ appointment.id }}">
+                                                    <i class="fas fa-eye"></i> Details
+                                                </button>
+                                                <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-danger" 
+                                                            onclick="return confirm('Are you sure you want to cancel this appointment?');">
+                                                        <i class="fas fa-times"></i> Cancel
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>You have no upcoming appointments.
+                            <a href="{{ url_for('donor_schedule_donation') }}" class="alert-link">Schedule one now!</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {% set past_appointments = appointments|selectattr('status', 'in', ['Completed'])|list %}
+                    {% if past_appointments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Hospital</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in past_appointments %}
+                                    <tr>
+                                        <td>{{ appointment.date }}</td>
+                                        <td>{{ appointment.time }}</td>
+                                        <td>{{ appointment.hospital_name }}</td>
+                                        <td>{{ appointment.hospital_location }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>You have no past appointments.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {% set cancelled_appointments = appointments|selectattr('status', 'in', ['Cancelled'])|list %}
+                    {% if cancelled_appointments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Hospital</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in cancelled_appointments %}
+                                    <tr>
+                                        <td>{{ appointment.date }}</td>
+                                        <td>{{ appointment.time }}</td>
+                                        <td>{{ appointment.hospital_name }}</td>
+                                        <td>{{ appointment.hospital_location }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>You have no cancelled appointments.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Appointment Details -->
+{% for appointment in appointments %}
+<div class="modal fade" id="detailsModal{{ appointment.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Appointment Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong>Date:</strong> {{ appointment.date }}
+                </div>
+                <div class="mb-3">
+                    <strong>Time:</strong> {{ appointment.time }}
+                </div>
+                <div class="mb-3">
+                    <strong>Hospital:</strong> {{ appointment.hospital_name }}
+                </div>
+                <div class="mb-3">
+                    <strong>Location:</strong> {{ appointment.hospital_location }}
+                </div>
+                <div class="mb-3">
+                    <strong>Status:</strong> 
+                    <span class="badge {% if appointment.status == 'Approved' %}bg-success
+                        {% elif appointment.status == 'Pending' %}bg-warning text-dark
+                        {% elif appointment.status == 'Cancelled' %}bg-danger
+                        {% else %}bg-info{% endif %}">
+                        {{ appointment.status }}
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <strong>Appointment ID:</strong> #{{ appointment.id }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                {% if appointment.status in ['Pending', 'Approved', 'Scheduled'] %}
+                <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Cancel Appointment</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tabs
+        var triggerTabList = [].slice.call(document.querySelectorAll('#appointmentTabs button'))
+        triggerTabList.forEach(function(triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+            triggerEl.addEventListener('click', function(event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+    });
+</script>
+{% endblock %}

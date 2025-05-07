@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Emergency Blood Request{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Create Emergency Blood Request</h1>
+            <p class="lead">Please complete this form to request emergency blood donations</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('hospital_emergency_requests') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Emergency Requests
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-medical me-2"></i>Request Form</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('hospital_create_emergency_request') }}">
+                        <div class="mb-3">
+                            <label for="blood_type" class="form-label">Blood Type Required <span class="text-danger">*</span></label>
+                            <select class="form-select" id="blood_type" name="blood_type" required>
+                                <option value="">Select blood type</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="quantity_needed" class="form-label">Quantity Needed (units) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="quantity_needed" name="quantity_needed" step="1" min="1" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="urgency_level" class="form-label">Urgency Level <span class="text-danger">*</span></label>
+                            <select class="form-select" id="urgency_level" name="urgency_level" required>
+                                <option value="normal">Normal - Within 24 hours</option>
+                                <option value="urgent">Urgent - Within 6 hours</option>
+                                <option value="critical">Critical - Immediate need</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Additional Information</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" placeholder="Provide any additional details about this emergency request"></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Emergency Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Important Information</h5>
+                </div>
+                <div class="card-body">
+                    <p>Emergency requests will immediately notify eligible donors in the system. Please only use this feature for genuine emergencies.</p>
+                    
+                    <div class="alert alert-warning">
+                        <h6 class="mb-2"><i class="fas fa-exclamation-triangle me-2"></i>Please Note:</h6>
+                        <ul class="mb-0">
+                            <li>Verify the blood type needed before submitting</li>
+                            <li>Set the appropriate urgency level</li>
+                            <li>Emergency requests will be visible to all matching donors</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <h6 class="mb-2"><i class="fas fa-clock me-2"></i>Urgency Levels:</h6>
+                        <ul class="mb-0">
+                            <li><strong>Normal</strong>: Need within 24 hours</li>
+                            <li><strong>Urgent</strong>: Need within 6 hours</li>
+                            <li><strong>Critical</strong>: Immediate need (life-threatening)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Donors - Admin{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h1 class="fw-bold text-red-700"><i class="fas fa-users me-2"></i>Manage Donors</h1>
+        <p class="lead">View and manage all blood donor accounts</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{{ url_for('admin_create_donor') }}" class="btn btn-danger">
+            <i class="fas fa-user-plus me-2"></i>Add New Donor
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-light py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">All Donors</h5>
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" class="form-control" id="searchDonors" placeholder="Search donors...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="donorsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Contact Number</th>
+                        <th>Blood Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for donor in donors %}
+                    <tr>
+                        <td>{{ donor.id }}</td>
+                        <td>{{ donor.username }}</td>
+                        <td>{{ donor.email }}</td>
+                        <td>{{ donor.contact_number or 'N/A' }}</td>
+                        <td>
+                            {% if donor.profile and donor.profile.blood_type %}
+                                <span class="badge bg-danger">{{ donor.profile.blood_type }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Unknown</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-success">Active</span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary view-donor" data-id="{{ donor.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-primary edit-donor" data-id="{{ donor.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form action="{{ url_for('admin_delete_donor', donor_id=donor.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the donor account <strong id="donorToDelete"></strong>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" action="" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        document.getElementById('searchDonors').addEventListener('keyup', function() {
+            let searchValue = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#donorsTable tbody tr');
+            
+            rows.forEach(row => {
+                let text = row.textContent.toLowerCase();
+                if(text.includes(searchValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Delete modal setup
+        const deleteButtons = document.querySelectorAll('.delete-donor');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const donorId = this.getAttribute('data-id');
+                const donorUsername = this.getAttribute('data-username');
+                
+                document.getElementById('donorToDelete').textContent = donorUsername;
+                document.getElementById('deleteForm').action = `/admin/donors/${donorId}/delete`;
+                
+                const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                modal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Hospitals - Admin{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h1 class="fw-bold text-red-700"><i class="fas fa-hospital me-2"></i>Manage Hospitals</h1>
+        <p class="lead">View and manage all hospital and blood bank accounts</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{{ url_for('admin_create_hospital') }}" class="btn btn-danger">
+            <i class="fas fa-plus-circle me-2"></i>Add New Hospital
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-light py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">All Hospitals & Blood Banks</h5>
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" class="form-control" id="searchHospitals" placeholder="Search hospitals...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="hospitalsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Active Requests</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hospital in hospitals %}
+                    <tr>
+                        <td>{{ hospital.id }}</td>
+                        <td>{{ hospital.username }}</td>
+                        <td>{{ hospital.email }}</td>
+                        <td>{{ hospital.contact_number or 'N/A' }}</td>
+                        <td>
+                            {% set active_requests = hospital.emergency_requests|selectattr('status', 'equalto', 'active')|list|length if hospital.emergency_requests else 0 %}
+                            {% if active_requests > 0 %}
+                                <span class="badge bg-danger">{{ active_requests }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">0</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-success">Active</span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary view-hospital" data-id="{{ hospital.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-primary edit-hospital" data-id="{{ hospital.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form action="{{ url_for('admin_delete_hospital', hospital_id=hospital.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-outline-danger delete-hospital" data-id="{{ hospital.id }}" data-name="{{ hospital.username }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the hospital account <strong id="hospitalToDelete"></strong>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" action="" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        document.getElementById('searchHospitals').addEventListener('keyup', function() {
+            let searchValue = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#hospitalsTable tbody tr');
+            
+            rows.forEach(row => {
+                let text = row.textContent.toLowerCase();
+                if(text.includes(searchValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Delete modal setup
+        const deleteButtons = document.querySelectorAll('.delete-hospital');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const hospitalId = this.getAttribute('data-id');
+                const hospitalName = this.getAttribute('data-name');
+                
+                document.getElementById('hospitalToDelete').textContent = hospitalName;
+                document.getElementById('deleteForm').action = `/admin/hospitals/${hospitalId}/delete`;
+                
+                const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                modal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

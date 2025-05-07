@@ -1,0 +1,9 @@
+<form method="POST">
+    <label for="username">Blood Bank Name:</label>
+    <input type="text" name="username" value="{{ blood_bank.username }}" required>
+    <label for="email">Email:</label>
+    <input type="email" name="email" value="{{ blood_bank.email }}" required>
+    <label for="contact_number">Contact Number:</label>
+    <input type="text" name="contact_number" value="{{ blood_bank.contact_number }}">
+    <button type="submit">Save Changes</button>
+</form>

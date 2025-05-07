@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Donation - BloodDonor{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="fw-bold text-red-700"><i class="fas fa-calendar-plus me-2"></i>Schedule Donation</h1>
+    <form method="POST" class="mt-4">
+        <div class="mb-3">
+            <label for="hospital_id" class="form-label">Select Hospital</label>
+            <select class="form-select" id="hospital_id" name="hospital_id" required>
+                <option value="" disabled selected>Select a hospital</option>
+                {% for hospital in hospitals %}
+                <option value="{{ hospital.id }}">{{ hospital.username }} - {{ hospital.location }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="appointment_date" class="form-label">Appointment Date</label>
+            <input type="datetime-local" class="form-control" id="appointment_date" name="appointment_date" required>
+        </div>
+        <button type="submit" class="btn btn-danger"><i class="fas fa-save me-2"></i>Schedule</button>
+        <a href="{{ url_for('donor_dashboard') }}" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Cancel</a>
+    </form>
+</div>
+{% endblock %}

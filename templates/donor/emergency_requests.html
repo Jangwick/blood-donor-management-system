@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Blood Requests - BloodDonor{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Emergency Blood Requests</h1>
+            <p class="lead">Urgent requests for blood donations that match your blood type</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('donor_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    {% if not current_user.profile or not current_user.profile.blood_type %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong>Your blood type is not set!</strong> Please <a href="{{ url_for('donor_profile') }}">update your profile</a> with your blood type to see matching emergency requests.
+        </div>
+    {% endif %}
+
+    {% if matching_requests %}
+        <div class="row g-4">
+            {% for request in matching_requests %}
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-tint me-2"></i>{{ request.blood_type }} Blood Needed
+                                <span class="badge bg-light text-danger ms-2">{{ request.quantity_needed }} units</span>
+                            </h5>
+                            <span class="badge 
+                                {% if request.urgency_level == 'critical' %}bg-dark
+                                {% elif request.urgency_level == 'urgent' %}bg-warning text-dark
+                                {% else %}bg-info text-dark{% endif %}">
+                                {{ request.urgency_level|upper }}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p><strong>Hospital:</strong> {{ request.hospital.username }}</p>
+                                <p><strong>Location:</strong> {{ request.hospital.location or 'Not specified' }}</p>
+                                <p><strong>Requested:</strong> {{ request.created_at.strftime('%b %d, %Y at %I:%M %p') }}</p>
+                                
+                                {% if request.message %}
+                                    <div class="alert alert-light border">
+                                        <i class="fas fa-quote-left text-muted me-2"></i>{{ request.message }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if request.id in responded_request_ids %}
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>You have already responded to this request.
+                                </div>
+                            {% else %}
+                                <form action="{{ url_for('donor_respond_to_emergency', request_id=request.id) }}" method="POST">
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" name="response" value="available" class="btn btn-success">
+                                            <i class="fas fa-check-circle me-2"></i>I'm Available to Donate
+                                        </button>
+                                        <button type="submit" name="response" value="unavailable" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times-circle me-2"></i>I Cannot Donate at This Time
+                                        </button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer bg-light">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                {% if request.urgency_level == 'critical' %}
+                                    <span class="text-danger">Immediate need - Critical situation</span>
+                                {% elif request.urgency_level == 'urgent' %}
+                                    <span class="text-warning">Needed within 6 hours</span>
+                                {% else %}
+                                    <span class="text-info">Needed within 24 hours</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            There are currently no emergency blood requests that match your blood type. Thank you for your willingness to help!
+        </div>
+    {% endif %}
+    
+    <div class="card mt-4 border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>About Emergency Donations</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-danger"><i class="fas fa-question-circle me-2"></i>What are emergency requests?</h6>
+                    <p>Emergency blood requests are issued by hospitals when there is an urgent need for specific blood types. These situations may include:</p>
+                    <ul>
+                        <li>Major accidents or natural disasters</li>
+                        <li>Surgical emergencies requiring transfusions</li>
+                        <li>Critical shortages of specific blood types</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>Responding to emergencies</h6>
+                    <p>If you choose to respond to an emergency request:</p>
+                    <ul>
+                        <li>The hospital will be notified of your availability immediately</li>
+                        <li>They may contact you directly using your registered phone number</li>
+                        <li>Try to arrive as soon as possible if you commit to donating</li>
+                        <li>Bring your ID and be prepared for a quick screening process</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

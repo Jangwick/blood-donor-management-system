@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Pending Appointments - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-red-700"><i class="fas fa-calendar-check me-2"></i>Pending Appointments</h1>
+            <p class="lead">Review and approve donation appointments</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    {% if pending_appointments %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Donor</th>
+                                <th>Hospital</th>
+                                <th>Appointment Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in pending_appointments %}
+                            <tr>
+                                <td>{{ appointment.donor.username }}</td>
+                                <td>{{ appointment.hospital.username }}</td>
+                                <td>
+                                    {% if appointment.appointment_date is string %}
+                                        {{ appointment.appointment_date }}
+                                    {% else %}
+                                        {{ appointment.appointment_date.strftime('%B %d, %Y at %I:%M %p') }}
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-warning">{{ appointment.status }}</span></td>
+                                <td>
+                                    <form action="{{ url_for('approve_appointment', appointment_id=appointment.id) }}" method="POST" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check me-1"></i> Approve
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>No pending appointments found.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

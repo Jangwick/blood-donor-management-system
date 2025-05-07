@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}My Badges - BloodDonor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-red-700"><i class="fas fa-medal me-2"></i>My Badges</h1>
+            <p class="lead">Track your achievements and milestones as a blood donor</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('donor_dashboard') }}" class="btn btn-outline-danger">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Badge Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-danger text-white">
+                <div class="card-body text-center py-4">
+                    <h2 class="display-4 fw-bold mb-0">{{ earned_badges|length }}</h2>
+                    <p class="mb-0">Badges Earned</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body text-center py-4">
+                    <h2 class="display-4 fw-bold mb-0">{{ donation_count }}</h2>
+                    <p class="mb-0">Total Donations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body text-center py-4">
+                    <h2 class="display-4 fw-bold mb-0">{{ total_volume }}</h2>
+                    <p class="mb-0">Units Donated</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Badge Progress -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Badge Progress</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h6>First Donation Badge</h6>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ badge_progress.first_donation.percentage }}%;" 
+                             aria-valuenow="{{ badge_progress.first_donation.current }}" 
+                             aria-valuemin="0" aria-valuemax="{{ badge_progress.first_donation.target }}">
+                            {{ badge_progress.first_donation.current }}/{{ badge_progress.first_donation.target }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Regular Donor Badge</h6>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-primary" role="progressbar" 
+                             style="width: {{ badge_progress.regular_donor.percentage }}%;" 
+                             aria-valuenow="{{ badge_progress.regular_donor.current }}" 
+                             aria-valuemin="0" aria-valuemax="{{ badge_progress.regular_donor.target }}">
+                            {{ badge_progress.regular_donor.current }}/{{ badge_progress.regular_donor.target }}
+                        </div>
+                    </div>
+                    <small class="text-muted">Donate 3 times within a year</small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Volume Achievement</h6>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-warning" role="progressbar" 
+                             style="width: {{ badge_progress.lifetime_volume.percentage }}%;" 
+                             aria-valuenow="{{ badge_progress.lifetime_volume.current }}" 
+                             aria-valuemin="0" aria-valuemax="{{ badge_progress.lifetime_volume.target }}">
+                            {{ badge_progress.lifetime_volume.current }}/{{ badge_progress.lifetime_volume.target }} units
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Earned Badges -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Earned Badges</h5>
+        </div>
+        <div class="card-body">
+            {% if earned_badges %}
+                <div class="row row-cols-2 row-cols-md-4 g-4">
+                    {% for badge in earned_badges %}
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="badge-icon mb-3">
+                                        <i class="fas fa-{{ badge.icon }} fa-3x text-warning"></i>
+                                    </div>
+                                    <h5 class="card-title">{{ badge.name }}</h5>
+                                    <p class="card-text text-muted">{{ badge.description }}</p>
+                                </div>
+                                <div class="card-footer bg-success text-white text-center">
+                                    <i class="fas fa-check-circle me-1"></i> Earned
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>You haven't earned any badges yet. Start donating to collect badges!
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Badges to Earn -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-unlock me-2"></i>Badges to Earn</h5>
+        </div>
+        <div class="card-body">
+            {% if unearned_badges %}
+                <div class="row row-cols-2 row-cols-md-4 g-4">
+                    {% for badge in unearned_badges %}
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm opacity-75">
+                                <div class="card-body text-center">
+                                    <div class="badge-icon mb-3">
+                                        <i class="fas fa-{{ badge.icon }} fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="card-title">{{ badge.name }}</h5>
+                                    <p class="card-text text-muted">{{ badge.description }}</p>
+                                </div>
+                                <div class="card-footer bg-secondary text-white text-center">
+                                    <i class="fas fa-lock me-1"></i> Not Yet Earned
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>Congratulations! You've earned all available badges.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

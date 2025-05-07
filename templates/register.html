@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - BloodDonor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg border-0 rounded-lg mt-3">
+            <div class="card-header bg-red-600 text-white text-center py-3">
+                <h3 class="my-2"><i class="fas fa-user-plus me-2"></i>Create Account</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3 mb-md-0">
+                                <label for="username" class="form-label">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="username" name="username" required placeholder="Choose a username">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 mb-md-0">
+                                <label for="email" class="form-label">Email address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3 mb-md-0">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input type="password" class="form-control" id="password" name="password" required placeholder="Create a password">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 mb-md-0">
+                                <label for="contact_number" class="form-label">Contact Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="text" class="form-control" id="contact_number" name="contact_number" required placeholder="Enter your phone number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="role" class="form-label">I am registering as a:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                            <select class="form-select" id="role" name="role">
+                                <option value="donor" selected>Blood Donor</option>
+                                <option value="hospital">Hospital/Blood Bank</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="agree" required>
+                        <label class="form-check-label" for="agree">I agree to the terms of service and privacy policy</label>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-danger btn-lg">Register</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3 bg-light">
+                <div class="mt-3">
+                    <p class="mb-2">Or register with:</p>
+                    <button class="btn btn-outline-primary me-2"><i class="fab fa-google me-2"></i>Google</button>
+                    <button class="btn btn-outline-primary"><i class="fab fa-facebook-f me-2"></i>Facebook</button>
+                </div>
+                <div class="mt-3">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none text-danger">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

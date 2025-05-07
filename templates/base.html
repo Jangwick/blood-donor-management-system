@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Blood Donor{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+    <style>
+        .top-navbar {
+            background-color: #e53e3e;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            color: white;
+            margin-right: 0.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-link {
+            
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ffc107 !important;
+        }
+
+        .navbar-toggler {
+            border: none;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: auto; /* Ensures the footer stays at the bottom */
+        }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensures the body takes up the full height of the viewport */
+        }
+
+        main {
+            flex-grow: 1; /* Pushes the footer to the bottom when content is short */
+        }
+
+        /* Enhanced logout button styling */
+        .logout-btn {
+           
+            border-radius: 4px;
+            padding: 0.5rem 1rem !important;
+            margin-left: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: white !important;
+        }
+        
+        .logout-btn:hover {
+            background-color: #dc3545;
+            color: white !important;
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
+        .logout-btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* User dropdown styling */
+        .user-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            color: white !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .user-dropdown-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+        }
+        
+        .user-dropdown .dropdown-menu {
+            margin-top: 10px;
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .user-dropdown .dropdown-item {
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-dropdown .dropdown-item i {
+            width: 20px;
+            margin-right: 8px;
+            text-align: center;
+        }
+        
+        .user-dropdown .dropdown-divider {
+            margin: 0.25rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="top-navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <!-- Logo Container -->
+            <a class="logo-container text-decoration-none" href="{{ url_for('index') }}">
+                <div class="logo-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="logo-text">BloodDonor</div>
+            </a>
+
+            <!-- Conditional Navigation Bar -->
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == 'admin' %}
+                <nav class="navbar navbar-expand-lg navbar-dark">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/admin/dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </li>
+
+                            <!-- Admin Management Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" 
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-cog me-2"></i>Admin Management
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="dropdown-item {% if request.path == '/admin/donors' %}active{% endif %}" href="{{ url_for('admin_donors') }}">
+                                            <i class="fas fa-users me-2"></i>Manage Donors
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item {% if request.path == '/admin/notifications' %}active{% endif %}" href="{{ url_for('admin_notifications') }}">
+                                            <i class="fas fa-bell me-2"></i>Notifications
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item {% if request.path == '/admin/badges' %}active{% endif %}" href="{{ url_for('admin_badges') }}">
+                                            <i class="fas fa-medal me-2"></i>Manage Badges
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/admin/hospitals' %}active{% endif %}" href="{{ url_for('admin_hospitals') }}">
+                                    <i class="fas fa-hospital me-2"></i>Manage Hospitals
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_emergency_requests') }}">
+                                    <i class="fas fa-exclamation-triangle me-1 text-danger"></i> Emergency Requests
+                                </a>
+                            </li>
+                           
+                            <!-- User Profile Dropdown -->
+                            <li class="nav-item dropdown user-dropdown">
+                                <a class="user-dropdown-toggle dropdown-toggle" href="#" id="userDropdown" role="button" 
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span>{{ current_user.username }}</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li class="dropdown-item-text text-muted small px-3 py-2">
+                                        <strong>Admin Account</strong>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="fas fa-user-shield"></i> My Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="fas fa-cog"></i> Settings
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                {% elif current_user.role == 'donor' %}
+                <nav class="navbar navbar-expand-lg navbar-dark">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/donor/dashboard' %}active{% endif %}" href="{{ url_for('donor_dashboard') }}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </li>
+                           
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/donor/appointments' %}active{% endif %}" href="{{ url_for('donor_appointments') }}">
+                                    <i class="fas fa-calendar-check me-2"></i>Appointments
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/donor/history' %}active{% endif %}" href="{{ url_for('donor_history') }}">
+                                    <i class="fas fa-history me-2"></i>Donation History
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/donor/badges' %}active{% endif %}" href="{{ url_for('donor_badges') }}">
+                                    <i class="fas fa-medal me-2"></i>My Badges
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('donor_emergency_requests') }}">
+                                    <i class="fas fa-exclamation-triangle me-1 text-danger"></i> Emergency Requests
+                                </a>
+                            </li>
+                            
+                            <!-- User Profile Dropdown -->
+                            <li class="nav-item dropdown user-dropdown">
+                                <a class="user-dropdown-toggle dropdown-toggle" href="#" id="userDropdown" role="button" 
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span>{{ current_user.username }}</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li class="dropdown-item-text text-muted small px-3 py-2">
+                                        <strong>Donor Account</strong>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('donor_profile') }}">
+                                            <i class="fas fa-user-circle"></i> My Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('donor_schedule_donation') }}">
+                                            <i class="fas fa-calendar-plus"></i> Schedule Donation
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                {% elif current_user.role == 'hospital' %}
+                <nav class="navbar navbar-expand-lg navbar-dark">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('hospital_emergency_requests') }}">
+                                    <i class="fas fa-exclamation-triangle me-1 text-danger"></i> Manage Emergency Requests
+                                </a>
+                            </li>
+                            
+                            <!-- User Profile Dropdown -->
+                            <li class="nav-item dropdown user-dropdown">
+                                <a class="user-dropdown-toggle dropdown-toggle" href="#" id="userDropdown" role="button" 
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-hospital-user"></i>
+                                    </div>
+                                    <span>{{ current_user.username }}</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li class="dropdown-item-text text-muted small px-3 py-2">
+                                        <strong>Hospital Account</strong>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('hospital_dashboard') }}">
+                                            <i class="fas fa-hospital"></i> Hospital Dashboard
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                {% endif %}
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container text-center">
+            <p>&copy; 2023 BloodDonor. All rights reserved.</p>
+            <p>
+                <a href="{{ url_for('about') }}">About Us</a> | 
+                <a href="{{ url_for('faq') }}">FAQs</a> | 
+                <a href="{{ url_for('contact') }}">Contact</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
