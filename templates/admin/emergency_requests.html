@@ -189,7 +189,7 @@
                                         <td>{{ request.quantity_needed }} units</td>
                                         <td>{{ request.created_at.strftime('%b %d, %H:%M') }}</td>
                                         <td>
-                                            {% if hasattr(request, 'updated_at') and request.updated_at %}
+                                            {% if request.updated_at is defined and request.updated_at %}
                                                 {{ request.updated_at.strftime('%b %d, %H:%M') }}
                                             {% else %}
                                                 {{ request.created_at.strftime('%b %d, %H:%M') if request.created_at else 'Unknown' }}
@@ -243,7 +243,7 @@
                                         </td>
                                         <td>{{ request.created_at.strftime('%b %d, %H:%M') }}</td>
                                         <td>
-                                            {% if hasattr(request, 'updated_at') and request.updated_at %}
+                                            {% if request.updated_at is defined and request.updated_at %}
                                                 {{ request.updated_at.strftime('%b %d, %H:%M') }}
                                             {% else %}
                                                 {{ request.created_at.strftime('%b %d, %H:%M') if request.created_at else 'Unknown' }}

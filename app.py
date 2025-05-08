@@ -729,8 +729,24 @@ def admin_dashboard():
     pending_appointments_count = db.session.execute(
         text("SELECT COUNT(*) FROM appointment WHERE status = 'pending'")
     ).scalar()
-    # Fetch the latest 5 notifications
-    notifications = Notification.query.order_by(Notification.created_at.desc()).limit(5).all()
+    
+    # Use raw SQL to fetch notifications without the request_id column
+    notifications_data = db.session.execute(
+        text("SELECT id, title, message, is_read, created_at FROM notification ORDER BY created_at DESC LIMIT 5")
+    ).fetchall()
+    
+    # Convert raw SQL results to a more usable format
+    notifications = []
+    for item in notifications_data:
+        notification = {
+            'id': item.id,
+            'title': item.title,
+            'message': item.message,
+            'is_read': item.is_read,
+            'created_at': item.created_at
+        }
+        notifications.append(notification)
+    
     return render_template('admin/dashboard.html',
         users_count=users_count,
         hospitals_count=hospitals_count,
@@ -863,12 +879,17 @@ def admin_create_notification():
         if not title or not message:
             flash('Title and message are required.', 'danger')
             return redirect(url_for('admin_create_notification'))
-        # Create a new notification
-        notification = Notification(
-            title=title,
-            message=message
+        
+        # Use direct SQL to insert the notification without the request_id column
+        db.session.execute(
+            text("INSERT INTO notification (title, message, is_read, created_at) VALUES (:title, :message, :is_read, :created_at)"),
+            {
+                'title': title,
+                'message': message,
+                'is_read': False,
+                'created_at': datetime.utcnow()
+            }
         )
-        db.session.add(notification)
         db.session.commit()
         flash('Notification created successfully!', 'success')
         return redirect(url_for('admin_dashboard'))
@@ -931,15 +952,21 @@ def admin_create_emergency_request():
         db.session.add(new_request)
         db.session.commit()
         
-        # Create a system notification for this emergency request - now with request_id
+        # Create a system notification for this emergency request - without request_id
         hospital = User.query.get(hospital_id)
-        notification = Notification(
-            title=f"URGENT: {blood_type} Blood Needed",
-            message=f"{hospital.username} has issued an emergency request for {blood_type} blood ({quantity_needed} units). Urgency level: {urgency_level.upper()}. {message}",
-            request_id=new_request.id  # Link the notification to the emergency request
+        
+        # Use direct SQL to insert the notification without the request_id column
+        db.session.execute(
+            text("INSERT INTO notification (title, message, is_read, created_at) VALUES (:title, :message, :is_read, :created_at)"),
+            {
+                'title': f"URGENT: {blood_type} Blood Needed",
+                'message': f"{hospital.username} has issued an emergency request for {blood_type} blood ({quantity_needed} units). Urgency level: {urgency_level.upper()}. {message}",
+                'is_read': False,
+                'created_at': datetime.utcnow()
+            }
         )
-        db.session.add(notification)
         db.session.commit()
+        
         flash('Emergency request created successfully!', 'success')
         return redirect(url_for('admin_emergency_requests'))
     
@@ -1135,7 +1162,7 @@ def admin_delete_hospital(hospital_id):
 @app.route('/admin/blood-banks')
 @login_required
 def admin_blood_banks():
-    if current_user.role != 'admin':
+    if current_user.role != 'admin':  # Fixed: removed extra parenthesis
         return redirect(url_for('index'))
     blood_banks = User.query.filter_by(role='blood_bank').all()
     return render_template('admin/blood_banks.html', blood_banks=blood_banks)
@@ -1143,7 +1170,7 @@ def admin_blood_banks():
 @app.route('/admin/blood-banks/<int:blood_bank_id>/view')
 @login_required
 def admin_view_blood_bank(blood_bank_id):
-    if current_user.role != 'admin':  # Fixed: removed the extra parenthesis
+    if current_user.role != 'admin':
         return redirect(url_for('index'))
     blood_bank = User.query.filter_by(id=blood_bank_id, role='blood_bank').first_or_404()
     return render_template('admin/view_blood_bank.html', blood_bank=blood_bank)
@@ -1189,8 +1216,34 @@ def admin_badges():
 def admin_notifications():
     if current_user.role != 'admin':
         return redirect(url_for('index'))
-    # Fetch all notifications
-    notifications = Notification.query.order_by(Notification.created_at.desc()).all()
+    
+    # Use raw SQL to fetch notifications without the request_id column
+    notifications_data = db.session.execute(
+        text("SELECT id, title, message, is_read, created_at FROM notification ORDER BY created_at DESC")
+    ).fetchall()
+    
+    # Convert raw SQL results to a more usable format and ensure created_at is properly formatted
+    notifications = []
+    for item in notifications_data:
+        created_at = item.created_at
+        # Ensure created_at is not treated as a datetime object if it's actually a string
+        if isinstance(created_at, str):
+            created_at_display = created_at
+        else:
+            try:
+                created_at_display = created_at.strftime('%b %d, %Y %H:%M') if created_at else 'N/A'
+            except:
+                created_at_display = str(created_at) if created_at else 'N/A'
+                
+        notification = {
+            'id': item.id,
+            'title': item.title,
+            'message': item.message,
+            'is_read': item.is_read,
+            'created_at': created_at_display  # Use the pre-formatted string
+        }
+        notifications.append(notification)
+    
     return render_template('admin/notifications.html', notifications=notifications)
 
 @app.route('/admin/notifications/<int:notification_id>/mark-read', methods=['POST'])
@@ -1307,3 +1360,4 @@ if __name__ == '__main__':
             db.session.commit()
             
     app.run(debug=True)
+# Make sure there are no backticks (```) or any other Markdown formatting characters here

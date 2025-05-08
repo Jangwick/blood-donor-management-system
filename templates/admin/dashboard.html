@@ -263,7 +263,13 @@
                             <h6 class="mb-1 {% if not notification.is_read %}text-danger{% endif %}">
                                 <i class="fas fa-bell me-2"></i>{{ notification.title }}
                             </h6>
-                            <small>{{ notification.created_at.strftime('%b %d, %Y %H:%M') }}</small>
+                            <small>
+                                {% if notification.created_at is string %}
+                                    {{ notification.created_at }}
+                                {% else %}
+                                    {{ notification.created_at.strftime('%b %d, %Y %H:%M') }}
+                                {% endif %}
+                            </small>
                         </div>
                         <p class="mb-1">{{ notification.message }}</p>
                     </a>

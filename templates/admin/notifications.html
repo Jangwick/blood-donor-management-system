@@ -28,7 +28,17 @@
                 <tr>
                     <td>{{ notification.title }}</td>
                     <td>{{ notification.message }}</td>
-                    <td>{{ notification.created_at.strftime('%b %d, %Y %H:%M') }}</td>
+                    <td>
+                        {% if notification.created_at is defined %}
+                            {% if notification.created_at is string or not notification.created_at %}
+                                {{ notification.created_at or 'N/A' }}
+                            {% else %}
+                                {{ notification.created_at.strftime('%b %d, %Y %H:%M') if notification.created_at.strftime else notification.created_at }}
+                            {% endif %}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                     <td>
                         {% if notification.is_read %}
                         <span class="badge bg-success">Read</span>
